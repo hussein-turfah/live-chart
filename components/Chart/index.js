@@ -13,6 +13,22 @@ export default function ChartContainer() {
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight,
+      layout: {
+        background: { type: 'solid', color: 'black' },
+        textColor: 'white',
+      },
+      grid: {
+        vertLines: { color: 'black' },
+        horzLines: { color: 'black' },
+      },
+      rightPriceScale: {
+        borderColor: '#444',
+        textColor: 'white',
+      },
+      timeScale: {
+        borderColor: '#444',
+        textColor: 'white',
+      },
     });
 
     chartRef.current = chart;
@@ -30,6 +46,22 @@ export default function ChartContainer() {
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
+  }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket('wss://fstream.binance.com/ws/btcusdt@markPrice');
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const price = parseFloat(data.p);
+      const time = Math.floor(Date.now() / 1000);
+
+      if (seriesRef.current) {
+        seriesRef.current.update({ time, value: price });
+      }
+    };
+
+    return () => socket.close();
   }, []);
 
   return <div ref={chartContainerRef} className={styles.chartContainer} />;
