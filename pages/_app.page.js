@@ -1,6 +1,5 @@
-import "@styles/fonts.scss";
 import "@styles/globals.scss";
-import App from "./App";
+import App from "@components/App";
 import { useState } from "react";
 
 const LiveChartApp = ({ Component, pageProps, domainName }) => {

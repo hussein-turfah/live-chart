@@ -1,5 +1,3 @@
-import styles from "./index.module.scss";
-
 const MyApp = ({ Component, pageProps, domainName }) => {
 
   return (
