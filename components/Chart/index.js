@@ -40,6 +40,8 @@ export default function ChartContainer() {
       timeScale: {
         borderColor: '#444',
         textColor: 'white',
+        timeVisible: true,
+        secondsVisible: true,
       },
     });
 
@@ -178,7 +180,10 @@ export default function ChartContainer() {
             {latestPrice.toLocaleString('en-US', {
               currency: 'USD',
               style: 'currency',
-            })}
+            }).split('.')[0]}
+            <span className={styles.decimalPart}>
+              .{latestPrice.toLocaleString('en-US', { currency: 'USD', style: 'currency' }).split('.')[1]}  {/* Decimal part */}
+            </span>
           </span>
         )}
         <div className={styles.priceDetails}>

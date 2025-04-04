@@ -22,6 +22,10 @@
       font-weight: 600;
       color: white;
 
+      .decimalPart {
+        font-size: 0.7em;
+      }
+
       &.priceUp {
         color: var(--green);
       }
