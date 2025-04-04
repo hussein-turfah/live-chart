@@ -7,6 +7,7 @@ export default function ChartContainer() {
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
   const latestPriceRef = useRef(null);
+  const areaSeriesRef = useRef(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -33,14 +34,13 @@ export default function ChartContainer() {
     });
 
     chartRef.current = chart;
-    seriesRef.current = chart.addLineSeries();
-    const areaSeries = chart.addAreaSeries({
+    areaSeriesRef.current = chart.addAreaSeries({
       topColor: 'rgba(0, 255, 0, 0.5)',
       bottomColor: 'rgba(0, 255, 0, 0.1)',
       lineColor: 'rgba(0, 255, 0, 1)',
+      lineType: 2,
+      priceLineColor: 'green',
     });
-
-    seriesRef.current = areaSeries;
 
     const handleResize = () => {
       chart.applyOptions({
@@ -52,13 +52,6 @@ export default function ChartContainer() {
     window.addEventListener('resize', handleResize);
     chart.timeScale().fitContent();
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
-    };
-  }, []);
-
-  useEffect(() => {
     const socket = new WebSocket('wss://fstream.binance.com/ws/btcusdt@markPrice');
 
     socket.onmessage = (event) => {
@@ -66,9 +59,12 @@ export default function ChartContainer() {
       const price = parseFloat(data.p);
       const time = Math.floor(Date.now() / 1000);
 
-      if (seriesRef.current) {
-        seriesRef.current.update({ time, value: price });
-        seriesRef.current.setMarkers([
+      if (areaSeriesRef.current) {
+        areaSeriesRef.current.update({ time, value: price });
+      }
+
+      if (areaSeriesRef.current) {
+        areaSeriesRef.current.setMarkers([
           {
             time,
             position: "inBar",
@@ -77,20 +73,29 @@ export default function ChartContainer() {
           },
         ]);
       }
+      // latestPriceRef.current = price;
     };
 
-    return () => socket.close();
-  }, []);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       if (latestPriceRef.current !== null && seriesRef.current) {
         const time = Math.floor(Date.now() / 1000);
         seriesRef.current.update({ time, value: latestPriceRef.current });
       }
     }, 100);
-    return () => clearInterval(interval);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chart.remove();
+      socket.close();
+      clearInterval(interval);
+    };
   }, []);
 
-  return <div ref={chartContainerRef} className={styles.chartContainer} />;
+  return (
+    <div className={styles.container}>
+      <div className={styles.title}>BTCUSDT Price Chart</div>
+      <div className={styles.subtitle}>Real-time price updates</div>
+      <div ref={chartContainerRef} className={styles.chart} />
+    </div>
+  );
 };
