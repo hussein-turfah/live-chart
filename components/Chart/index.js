@@ -6,6 +6,7 @@ export default function ChartContainer() {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
+  const latestPriceRef = useRef(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -33,6 +34,13 @@ export default function ChartContainer() {
 
     chartRef.current = chart;
     seriesRef.current = chart.addLineSeries();
+    const areaSeries = chart.addAreaSeries({
+      topColor: 'rgba(0, 255, 0, 0.5)',
+      bottomColor: 'rgba(0, 255, 0, 0.1)',
+      lineColor: 'rgba(0, 255, 0, 1)',
+    });
+
+    seriesRef.current = areaSeries;
 
     const handleResize = () => {
       chart.applyOptions({
@@ -42,6 +50,8 @@ export default function ChartContainer() {
     };
 
     window.addEventListener('resize', handleResize);
+    chart.timeScale().fitContent();
+
     return () => {
       window.removeEventListener('resize', handleResize);
       chart.remove();
@@ -58,10 +68,28 @@ export default function ChartContainer() {
 
       if (seriesRef.current) {
         seriesRef.current.update({ time, value: price });
+        seriesRef.current.setMarkers([
+          {
+            time,
+            position: "inBar",
+            color: 'green',
+            shape: 'circle',
+          },
+        ]);
       }
     };
 
     return () => socket.close();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (latestPriceRef.current !== null && seriesRef.current) {
+        const time = Math.floor(Date.now() / 1000);
+        seriesRef.current.update({ time, value: latestPriceRef.current });
+      }
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
 
   return <div ref={chartContainerRef} className={styles.chartContainer} />;
