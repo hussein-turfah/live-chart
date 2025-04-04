@@ -1,4 +1,97 @@
 .container {
+  .controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    color: white;
+
+    .upIcon {
+      color: var(--green);
+    }
+
+    .downIcon {
+      color: var(--red);
+    }
+
+    .price {
+      font-size: 2rem;
+      font-weight: 600;
+      color: white;
+
+      &.priceUp {
+        color: var(--green);
+      }
+
+      &.priceDown {
+        color: var(--red);
+      }
+    }
+
+    .priceDetails {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+
+      .symbol {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+
+        .pointSeparator {
+          background-color: var(--gray);
+          height: 2px;
+          width: 2px;
+          border-radius: 50%;
+          margin: 0 5px;
+        }
+
+        .symbolText {
+          color: var(--gray);
+          font-weight: 600;
+        }
+      }
+
+      .priceChange {
+        display: flex;
+        align-items: center;
+        color: var(--gray);
+        font-weight: 600;
+
+        @media screen and (max-width: 768px) {
+          flex-direction: column;
+          align-items: flex-start;
+
+          .pointSeparator {
+            display: none;
+          }
+        }
+
+        .volumeValue {
+          color: white;
+        }
+
+        .highValue {
+          color: var(--green);
+        }
+
+        .lowValue {
+          color: var(--red);
+        }
+
+        .pointSeparator {
+          background-color: rgb(177, 182, 198);
+          height: 2px;
+          width: 2px;
+          border-radius: 50%;
+          margin: 0 5px;
+        }
+      }
+    }
+  }
 
   .chart {
     width: 100vw;
@@ -8,5 +101,7 @@
     padding: 0;
     overflow: hidden;
     cursor: crosshair;
+    z-index: 0;
+    position: relative;
   }
 }
